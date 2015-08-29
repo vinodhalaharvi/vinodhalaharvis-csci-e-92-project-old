@@ -1,0 +1,66 @@
+			  Questionnaire for
+
+		 Harvard Extension School CSCI E-92:
+		   Principles of Operating Systems
+
+			      Fall 2015
+
+
+Name:				Home phone number:
+
+
+E-mail:				Work phone number:
+
+
+Occupation (If an undergraduate student, please specify your major and
+year and at which school; If a graduate student, please specify your
+department, field, and year and at which school):
+
+
+Have you taken CSCI E-10a (Formerly CSCI E-50a), CSCI E-10b (Formerly
+CSCI E-50b), CSCI E-22 (Formerly CSCI E-119), and/or CSCI E-28
+(Formerly CSCI E-215) (specify which)?
+
+
+Do you have experience using Unix?  Do you have experience programming
+using Unix system calls?
+
+	If not, how do you meet the prerequisite?
+
+
+Are you already registered for this class?  -- If not, do you intend
+to register?
+
+
+Are you taking the course for graduate credit?
+
+If section cannot be held on Tuesday evening, on which other evening
+would you prefer section be held?  Circle preferred evenings.
+
+        Monday   Wecdnesday   Thursday
+
+What appropriate course or work experience do you have?
+
+
+
+What is your math background?
+
+
+What computer languages do you know (please include assembler and
+high-level languages)?  Have you programmed in the C Programming
+Language?
+
+
+What operating systems have you used (e.g. Windows, Mac OS, Linux, etc.)?
+
+
+What computers have you used (i.e., which machine language instruction sets)?
+
+
+Why are you taking the course?
+
+
+If the class needs to be rescheduled, is Thursday evening acceptable?
+
+
+Other comments (please continue on the back):
