@@ -1,0 +1,3 @@
+REVIEWBOARD_URL = 'http://cr.cscie9x.net/'
+REPOSITORY = 'students-csci-e-92-project'
+
