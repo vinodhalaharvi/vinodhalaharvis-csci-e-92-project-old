@@ -5,13 +5,68 @@
 
 const int LINE_MAX = 256;
 
-void process_line(char line[LINE_MAX + 1]) {
-   if (!strncmp(line, "ls", LINE_MAX)) {
-      fprintf(stdout, "your files here\n");
+int cmd_date(int argc, char *argv[]);
+int cmd_echo(int argc, char *argv[]);
+int cmd_exit(int argc, char *argv[]);
+int cmd_help(int argc, char *argv[]);
 
-   } else {
-      fprintf(stdout, "%s\n", line);
-   }
+struct commandEntry {
+ char *name;
+ int (*functionp)(int argc, char *argv[]);
+} commands[] = {{"date", cmd_date},
+               {"echo", cmd_echo},
+               {"exit", cmd_exit},
+               {"help", cmd_help}};
+
+void split (char line[LINE_MAX +1], int argc, char *argv[]){
+    
+    return; 
+}
+
+int (*functionp)(int argc, char * argv[]) 
+    get_command_function(char line[LINE_MAX+1], int arvc, char * argv[]){ 
+    int (*)(int argc, char * argv[]) func; 
+    while(commands[i] != NULL){ 
+        if (equal(commands[i], argv[0])){ 
+            return comamnds[i].functionp; 
+        } 
+    }
+    return NULL; 
+}
+
+
+int do_command(line, argc, argv){ 
+    int (*func)(int argc, char * argv[]); 
+    func = get_command_function(line, argc, argv); 
+    if (func == NULL){ 
+        fprintf(stderr, "Command %s not found \n", argv[0]); 
+        result = 127; 
+    } else { 
+        result = func(argc, argv); 
+    }
+    return result; 
+}
+
+void memory_free(char line[LINE_MAX +1], int argc, char * argv[]){ 
+    int i;
+    for (i = 0; i < argc; ++i) {
+        free(argv[i]); 
+    }
+    free(argv); 
+}
+
+
+void process_line(char line[LINE_MAX + 1]) {
+    int result; 
+    split(line, &argc, argv); 
+    result = do_command(line, argc, argv); 
+    if (result == 0) {
+        memoryfree(line, argc, argv); 
+        return result; 
+    } else {
+        print_error(line, argc, argv); 
+        return result;
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -34,4 +89,21 @@ int main(int argc, char *argv[]) {
       process_line(line);
       return 0;
    }
+}
+
+
+int cmd_date(int argc, char *argv[]){ 
+    return 0;
+}
+
+int cmd_echo(int argc, char *argv[]){ 
+    return 0;
+}
+
+int cmd_exit(int argc, char *argv[]){ 
+    return 0;
+}
+
+int cmd_help(int argc, char *argv[]){ 
+    return 0;
 }
