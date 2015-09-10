@@ -1,0 +1,23 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+LINE_MAX	src/shell.c	/^const int LINE_MAX = 256;$/;"	v
+cmd_date	src/shell.c	/^int cmd_date(int argc, char *argv[]){ $/;"	f
+cmd_echo	src/shell.c	/^int cmd_echo(int argc, char *argv[]){ $/;"	f
+cmd_exit	src/shell.c	/^int cmd_exit(int argc, char *argv[]){ $/;"	f
+cmd_help	src/shell.c	/^int cmd_help(int argc, char *argv[]){ $/;"	f
+commandEntry	src/shell.c	/^struct commandEntry {$/;"	s	file:
+commands	src/shell.c	/^} commands[] = {{"date", cmd_date},$/;"	v	typeref:struct:commandEntry
+do_command	src/shell.c	/^int do_command(char line[LINE_MAX + 1], int *argc, char * argv[]){ $/;"	f
+func_type	src/shell.c	/^typedef int (*func_type) (int argc, char * argv[]); $/;"	t	file:
+functionp	src/shell.c	/^    int (*functionp)(int , char *[]);$/;"	m	struct:commandEntry	file:
+get_command_function	src/shell.c	/^func_type get_command_function(char line[LINE_MAX+1], int *argc, char * argv[]){ $/;"	f
+main	src/shell.c	/^int main(int argc, char *argv[]) {$/;"	f
+memory_free	src/shell.c	/^void memory_free(char line[LINE_MAX +1], int *argc, char * argv[]){ $/;"	f
+name	src/shell.c	/^    char *name;$/;"	m	struct:commandEntry	file:
+print_error	src/shell.c	/^void print_error(char line[LINE_MAX +1], int *argc, char * argv[]){ $/;"	f
+process_line	src/shell.c	/^int  process_line(char line[LINE_MAX + 1], int *argc, char * argv[]) {$/;"	f
+split	src/shell.c	/^void split(char line[LINE_MAX +1], int *argc, char *argv[]){$/;"	f
