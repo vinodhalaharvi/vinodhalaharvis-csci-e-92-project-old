@@ -1,6 +1,6 @@
 CFLAGS=-ggdb
 
-all: shell
+all: shell map
 
 debug: shell
 	gdb ./shell
@@ -10,5 +10,7 @@ run: shell
 
 shell: shell.o
 
+map: map.o 
+
 clean:
-	rm -f *.o shell
+	rm -f *.o shell 

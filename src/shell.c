@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <string.h>
 #include <assert.h>
+#include "map.h"
 
 #define MAX_STRING_LENGTH 1000
 
@@ -24,6 +25,27 @@ command_func_type get_command_function(char line[LINE_MAX+1], int *argc, char * 
 int do_command(char line[LINE_MAX + 1], int *argc, char * argv[]); 
 void memory_free(char line[LINE_MAX +1], int *argc, char * argv[]); 
 void print_error(char line[LINE_MAX +1], int *argc, char * argv[]); 
+char *join(char * stringArray[], char * delimiter); 
+
+
+//"January 23, 2014 15:57:07.123456".  "date" will call'
+char * months[12]= { 
+    "January", 
+    "Febrauary", 
+    "March", 
+    "April", 
+    "May", 
+    "June", 
+    "July", 
+    "August", 
+    "September", 
+    "October", 
+    "November", 
+    "December"
+}; 
+
+int lmonthdays[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; 
+int nlmonthdays[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; 
 
 struct commandEntry {
     char *name;
