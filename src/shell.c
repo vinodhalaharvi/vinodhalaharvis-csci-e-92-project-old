@@ -5,28 +5,11 @@
 #include <string.h>
 #include <assert.h>
 #include "map.h"
-
+#include "shell.h"
+#include "limits.h"
 #define MAX_STRING_LENGTH 1000
 
-const int LINE_MAX = 256;
-typedef int (*command_func_type) (int argc, char * argv[]); 
-typedef enum {
-    false, 
-    true
-} boolean;
-
-int cmd_date(int argc, char *argv[]);
-int cmd_echo(int argc, char *argv[]);
-int cmd_exit(int argc, char *argv[]);
-int cmd_help(int argc, char *argv[]);
-int process_line(char line[LINE_MAX + 1], int *argc, char * argv[]);
-void split(char line[LINE_MAX +1], int *argc, char *argv[]);
-command_func_type get_command_function(char line[LINE_MAX+1], int *argc, char * argv[]); 
-int do_command(char line[LINE_MAX + 1], int *argc, char * argv[]); 
-void memory_free(char line[LINE_MAX +1], int *argc, char * argv[]); 
-void print_error(char line[LINE_MAX +1], int *argc, char * argv[]); 
-char *join(char * stringArray[], char * delimiter); 
-
+boolean isline(char line[LINE_MAX +1]) ; 
 
 //"January 23, 2014 15:57:07.123456".  "date" will call'
 char * months[12]= { 
@@ -55,8 +38,10 @@ struct commandEntry {
     {"date", cmd_date},
     {"exit", cmd_exit},
     {"help", cmd_help}, 
+    {"set", cmd_set}, 
     {NULL, NULL}
 };
+static node_type * env = NULL; 
 
 int main(int argc, char *argv[]) {
     int i; 
@@ -64,8 +49,13 @@ int main(int argc, char *argv[]) {
     int c, index;
     index = 0;
     while(1){ 
+        fputs("$ ", stdout); 
         c = fgetc(stdin);
         while (c > 0 && c != '\n' && index < LINE_MAX) {
+            if (isSlash(c)) { 
+                c = fgetc(stdin); 
+                c = subescapse_char(c); 
+            }
             line[index++] = c;
             c = fgetc(stdin);
         }
@@ -114,8 +104,54 @@ int cmd_echo(int argc, char *argv[]){
     return 0;
 }
 
+int cmd_set(int argc, char *argv[]){ 
+    char *values[2]; 
+    int count = 0; 
+    if (match(argv[0], "set")){ 
+        if (argc == 1){ 
+            print(env); 
+            return; 
+        } else { 
+            split(argv[1], "=", &count, values); 
+            assert(count == 2); 
+            env = put(env, values[0], values[1]); 
+        }
+    }
+    return 0;
+}
+
+long toLong(char * string, int base){ 
+        /* Code from strtol man page documentation */
+       char * endptr; 
+       errno = 0; 
+       long val; 
+       val = strtol(string, &endptr, base);
+       assert (!(errno == ERANGE && (val == LONG_MAX || val == LONG_MIN))
+               || (errno != 0 && val == 0)); 
+       assert (endptr != string); 
+}
+
+long toUnsignedLong(char * string, int base){ 
+        /* Code from strtol man page documentation */
+       errno = 0; 
+       char * endptr; 
+       long val; 
+       val = strtoul(string, &endptr, base);
+       assert (!(errno == ERANGE && (val == LONG_MAX || val == LONG_MIN))
+               || (errno != 0 && val == 0)); 
+       assert (endptr != string); 
+} 
+
+
 int cmd_exit(int argc, char *argv[]){ 
-    fprintf(stdout, "%s\n", "cmd_exit");
+    long exit_code; 
+    if (argc > 1) { 
+        exit_code = toLong(argv[1], 10); 
+        assert(0); 
+        exit(exit_code); 
+    } else { 
+        exit(0); 
+    }
     return 0;
 }
 
@@ -126,7 +162,10 @@ int cmd_help(int argc, char *argv[]){
 
 int  process_line(char line[LINE_MAX + 1], int *argc, char * argv[]) {
     int result; 
-    split(line, argc, argv); 
+    if (!isline(line)){ 
+        return 0;  
+    }
+    split(line, " ", argc, argv); 
     result = do_command(line, argc, argv); 
     if (result != 0){ 
         print_error(line, argc, argv); 
@@ -135,9 +174,22 @@ int  process_line(char line[LINE_MAX + 1], int *argc, char * argv[]) {
     return result;
 }
 
-void split(char line[LINE_MAX +1], int *argc, char *argv[]){
+boolean isline(char line[LINE_MAX +1]){ 
+    int i = 0; 
+    assert(line); 
+    while(line[i] != '\0' && line[i] != '\n'){ 
+        if (line[i] != ' '){ 
+            return true; 
+        }
+        i++; 
+    }
+    return false; 
+}
+
+
+void split(char line[LINE_MAX +1], char * delimiter, int *argc, char *argv[]){
     char *string; 
-    string = strtok(line, " "); 
+    string = strtok(line, delimiter); 
     int count = 0; 
     while(string){ 
         //fprintf(stdout, "%s\n", string);
@@ -161,16 +213,18 @@ command_func_type get_command_function(char line[LINE_MAX+1], int *argc, char * 
     return NULL; 
 }
 
-
 int do_command(char line[LINE_MAX + 1], int *argc, char * argv[]){ 
     int (*func)(int argc, char * argv[]); 
     int result; 
+    assert(argv); 
+    assert(argc > 0); 
     func = get_command_function(line, argc, argv); 
+    assert(0); 
+    //assert(func); 
     if (func == NULL){ 
         fprintf(stderr, "Command %s not found \n", argv[0]); 
         result = 127; 
     } else { 
-        fprintf(stdout, "Calling %s\n", argv[0]);
         result = func(*argc, argv); 
     }
     return result; 
@@ -242,3 +296,24 @@ boolean is_leap_year(int yearno){
         return false; 
     }
 }
+
+boolean isSlash(char ch){ 
+    return ch == '\\'; 
+}
+
+char subescapse_char(char ch){ 
+    switch (ch) {
+        case '0': return '\0'; 
+        case 'a': return 7; 
+        case 'b': return 8; 
+        case 'e': return 27;
+        case 'f': return 12;
+        case 'n': return 10;
+        case 'r': return 13;
+        case 't': return 9; 
+        case 'v': return 11;
+        default: return ch; 
+    }
+}
+
+

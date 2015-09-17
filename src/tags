@@ -4,35 +4,37 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
-LINE_MAX	shell.c	/^const int LINE_MAX = 256;$/;"	v
+LINE_MAX	shell.h	/^const int LINE_MAX = 256;$/;"	v
 MAX_LIST_SIZE	map.h	7;"	d
-MAX_STRING_LENGTH	shell.c	9;"	d	file:
+MAX_STRING_LENGTH	shell.c	10;"	d	file:
 _MAP_H	map.h	2;"	d
 boolean	map.h	/^typedef enum { false, true } boolean; $/;"	t	typeref:enum:__anon1
-boolean	shell.c	/^} boolean;$/;"	t	typeref:enum:__anon2	file:
 cmd_date	shell.c	/^int cmd_date(int argc, char *argv[]){ $/;"	f
 cmd_echo	shell.c	/^int cmd_echo(int argc, char *argv[]){ $/;"	f
 cmd_exit	shell.c	/^int cmd_exit(int argc, char *argv[]){ $/;"	f
 cmd_help	shell.c	/^int cmd_help(int argc, char *argv[]){ $/;"	f
+cmd_set	shell.c	/^int cmd_set(int argc, char *argv[]){ $/;"	f
 commandEntry	shell.c	/^struct commandEntry {$/;"	s	file:
-command_func_type	shell.c	/^typedef int (*command_func_type) (int argc, char * argv[]); $/;"	t	file:
+command_func_type	shell.h	/^typedef int (*command_func_type) (int argc, char * argv[]); $/;"	t
 commands	shell.c	/^} commands[] = {$/;"	v	typeref:struct:commandEntry
 contains	map.c	/^boolean contains(node_type * node, key_type key){$/;"	f
 days	shell.c	/^time_t days(time_t seconds){$/;"	f
 delete	map.c	/^void delete(node_type **head, key_type key){$/;"	f
 do_command	shell.c	/^int do_command(char line[LINE_MAX + 1], int *argc, char * argv[]){ $/;"	f
+env	shell.c	/^static node_type * env = NULL; $/;"	v	file:
 false	map.h	/^typedef enum { false, true } boolean; $/;"	e	enum:__anon1
-false	shell.c	/^    false, $/;"	e	enum:__anon2	file:
+freenode	map.c	/^void freenode(node_type * node){ $/;"	f
 functionp	shell.c	/^    int (*functionp)(int , char *[]);$/;"	m	struct:commandEntry	file:
 get	map.c	/^value_type get(node_type * node, key_type key){$/;"	f
 get_command_function	shell.c	/^command_func_type get_command_function(char line[LINE_MAX+1], int *argc, char * argv[]){ $/;"	f
 hours	shell.c	/^time_t hours(time_t seconds){ $/;"	f
+isSlash	shell.c	/^boolean isSlash(ch){ $/;"	f
 is_leap_year	shell.c	/^boolean is_leap_year(int yearno){ $/;"	f
+isline	shell.c	/^boolean isline(char line[LINE_MAX +1]){ $/;"	f
 join	shell.c	/^char *join(char * stringArray[], char * delimiter){ $/;"	f
 key	map.h	/^    key_type key; $/;"	m	struct:node_type
 key_type	map.h	/^typedef char * key_type; $/;"	t
 lmonthdays	shell.c	/^int lmonthdays[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; $/;"	v
-main	map.c	/^int main(int argc, char *argv[])$/;"	f
 main	shell.c	/^int main(int argc, char *argv[]) {$/;"	f
 match	map.c	/^boolean match(key_type key, key_type otherkey) { $/;"	f
 memory_free	shell.c	/^void memory_free(char line[LINE_MAX +1], int *argc, char * argv[]){ $/;"	f
@@ -50,8 +52,8 @@ print_error	shell.c	/^void print_error(char line[LINE_MAX +1], int *argc, char *
 process_line	shell.c	/^int  process_line(char line[LINE_MAX + 1], int *argc, char * argv[]) {$/;"	f
 put	map.c	/^node_type * put(node_type * node, key_type key, value_type value){$/;"	f
 size	map.h	/^    int size; $/;"	m	struct:node_type
-split	shell.c	/^void split(char line[LINE_MAX +1], int *argc, char *argv[]){$/;"	f
+split	shell.c	/^void split(char line[LINE_MAX +1], char * delimiter, int *argc, char *argv[]){$/;"	f
+subescapse_char	shell.c	/^char subescapse_char(ch){ $/;"	f
 true	map.h	/^typedef enum { false, true } boolean; $/;"	e	enum:__anon1
-true	shell.c	/^    true$/;"	e	enum:__anon2	file:
 value	map.h	/^    value_type value; $/;"	m	struct:node_type
 value_type	map.h	/^typedef char * value_type; $/;"	t

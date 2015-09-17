@@ -4,21 +4,27 @@
 #include "map.h"
 #include <assert.h>
 
-int main(int argc, char *argv[])
+/*int main(int argc, char *argv[])
 {
     node_type * environ = NULL; 
+    //map.c testing..
     environ = put(environ, "key1", "value1");
     environ = put(environ, "key2", "value2");
     environ = put(environ, "key3", "value3");
+    assert(contains(environ, "key1") == true); 
+    assert(contains(environ, "key2") == true); 
+    assert(contains(environ, "key3") == true); 
+
     delete(&environ, "key2"); 
+    assert(contains(environ, "key2") == false); 
     print(environ); 
     return 0; 
-}
+}*/
 
 void print(node_type * environ){
     int i = 0;  
     while(environ){
-        fprintf(stdout, "%s=%s\n", environ->key, environ->value);
+        fprintf(stdout, "%s = %s\n", environ->key, environ->value);
         environ = environ->next;
     }
 }

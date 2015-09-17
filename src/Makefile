@@ -8,7 +8,7 @@ debug: shell
 run: shell
 	./shell
 
-shell: shell.o
+shell: shell.o map.o
 
 map: map.o 
 
