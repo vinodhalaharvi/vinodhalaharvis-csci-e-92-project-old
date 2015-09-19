@@ -10,6 +10,7 @@
 #define MAX_STRING_LENGTH 1000
 
 boolean isline(char line[LINE_MAX +1]) ; 
+static int inside_double_quote = 0; 
 
 //"January 23, 2014 15:57:07.123456".  "date" will call'
 char * months[12]= { 
@@ -56,9 +57,11 @@ int main(int argc, char *argv[]) {
                 c = fgetc(stdin); 
                 c = subescapse_char(c); 
             }
+            double_quote_check(&c); 
             line[index++] = c;
             c = fgetc(stdin);
         }
+        assert(!inside_double_quote); 
         line[index] = '\0';
         if (ferror(stdin)) {
             fprintf(stderr, "error while reading line: %s\n", strerror(errno));
@@ -89,18 +92,26 @@ char *join(char * stringArray[], char * delimiter){
 }
 
 int cmd_date(int argc, char *argv[]){ 
-    fprintf(stdout, "%s\n", "cmd_date");
-    int time = gettimeofday(); 
-    if (time == 0){ 
-        fprintf(stdout, "Current time in epochs is: %d\n", time);
-    } else {  
-        perror("time"); 
-    }
-    return 0;
+    int result;
+    struct timeval time_value; 
+    unsigned long  seconds, minutes, hours; 
+    unsigned long  useconds; 
+    unsigned long days; 
+    memset(&time_value, '\0', sizeof(struct timeval)); 
+    result = gettimeofday(&time_value, NULL); 
+    assert(result == 0); 
+    seconds = time_value.tv_sec; 
+    useconds = time_value.tv_usec; 
+    minutes = seconds/60; 
+    hours =  minutes/60; 
+    days =  hours/24;
+    calendar(days, seconds, useconds); 
+    return 0; 
 }
 
 int cmd_echo(int argc, char *argv[]){ 
-    fprintf(stdout, "%s\n", join(argv, " ")); 
+    argv[argc] = NULL; 
+    fprintf(stdout, "%s\n", join(++argv, " ")); 
     return 0;
 }
 
@@ -156,7 +167,12 @@ int cmd_exit(int argc, char *argv[]){
 }
 
 int cmd_help(int argc, char *argv[]){ 
-    fprintf(stdout, "%s\n", "cmd_help");
+    fprintf(stdout, "%s\n", "The following commands are available");
+    int i = 0; 
+    while(commands[i].name){ 
+        fprintf(stdout, "%s\n", commands[i].name);
+        i++; 
+    }
     return 0;
 }
 
@@ -165,7 +181,9 @@ int  process_line(char line[LINE_MAX + 1], int *argc, char * argv[]) {
     if (!isline(line)){ 
         return 0;  
     }
-    split(line, " ", argc, argv); 
+    //split(line, " ", argc, argv); 
+    splitString(line, ' ', argv, argc); 
+    //printStringArray(argv, *argc); 
     result = do_command(line, argc, argv); 
     if (result != 0){ 
         print_error(line, argc, argv); 
@@ -195,7 +213,7 @@ void split(char line[LINE_MAX +1], char * delimiter, int *argc, char *argv[]){
         //fprintf(stdout, "%s\n", string);
         argv[count++] = strdup(string); 
         //free(string);  ? shouldn't this be freed
-        string = strtok(NULL, " "); 
+        string = strtok(NULL, delimiter); 
     }
     *argc = count; 
     return; 
@@ -219,7 +237,6 @@ int do_command(char line[LINE_MAX + 1], int *argc, char * argv[]){
     assert(argv); 
     assert(argc > 0); 
     func = get_command_function(line, argc, argv); 
-    assert(0); 
     //assert(func); 
     if (func == NULL){ 
         fprintf(stderr, "Command %s not found \n", argv[0]); 
@@ -304,7 +321,15 @@ boolean isSlash(char ch){
 char subescapse_char(char ch){ 
     switch (ch) {
         case '0': return '\0'; 
-        case 'a': return 7; 
+        case 'a': return '\a'; 
+        case 'b': return '\b'; 
+        case 'e': return '\e';
+        case 'f': return '\f';
+        case 'n': return '\n';
+        case 'r': return '\r';
+        case 't': return '\t'; 
+        case 'v': return '\v';
+        /*case 'a': return 7; 
         case 'b': return 8; 
         case 'e': return 27;
         case 'f': return 12;
@@ -312,8 +337,153 @@ char subescapse_char(char ch){
         case 'r': return 13;
         case 't': return 9; 
         case 'v': return 11;
-        default: return ch; 
+        default: return ch; */
     }
+}
+
+/*
+Extra credit: Allow fields on the line to be double-quote delimited
+strings that can contain spaces or tabs.  Ensure that any such
+field has a matching open double-quote and close double-quote.
+Also, allow a double-quote to appear within a double-quoted field
+in either or both of two possible ways: (1) allow two adjacent
+double-quotes within a double-quoted field to denote a single
+double-quote within the field, (2) implement the following
+backslash escape notation to allow special characters within a
+double-quoted string. 
+*/
+void double_quote_check(int *ch){ 
+    if (*ch == 34){ 
+        while ((*ch = fgetc(stdin)) == 34); 
+        inside_double_quote = !inside_double_quote; 
+    }
+    return; 
+}
+
+
+/* 
+int howmany;
+char *store[10]; 
+char delimiter = ' ';
+splitString(string, delimiter, store, &howmany);  
+*/
+void splitString(char * string, char delimiter, char *store[10], int *howmany){ 
+    int i = 0; 
+    int argc = 0; 
+    char * head = string; 
+    assert (string); 
+    *howmany = 0; 
+    while(string[i]){ 
+        if (string[i] ==  delimiter && string[i+1] != delimiter) { 
+            assert(argc < 9); 
+            string[i++] = '\0'; 
+            store[argc++] = head; 
+            (*howmany)++; 
+            head = string + i; 
+        }
+        i++; 
+    }
+    if (!argc){ 
+        store[0] = string; 
+        *howmany = 1; 
+        store[1] = NULL; 
+    } else { 
+        store[argc++] = head; 
+        (*howmany)++; 
+        store[argc] = NULL; 
+    }
+}
+
+void printStringArray(char *stringArray[], int howmany){ 
+    assert(stringArray); 
+    int i =0; 
+    for (i = 0; i < howmany; ++i) {
+        fprintf(stdout, "%s\n", stringArray[i]); 
+    }
+    return; 
+}
+
+
+int getNumDaysInThisMonth(long year, long month){ 
+    static int lmdays[] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31} ; 
+    static int nlmdays[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; 
+    if (is_leap_year(year)){ 
+        return lmdays[month]; 
+    } else { 
+        return nlmdays[month]; 
+    }
+}
+
+void calendar(unsigned long days, 
+    unsigned long seconds, unsigned long useconds){ 
+    unsigned long year = 1970, month = 0; 
+    unsigned long daycount = 1; 
+    unsigned long dayofmonth = 0; 
+    unsigned long secondcount = 0; 
+    long minutes, hours; 
+    long months, years;
+    clock clock; 
+    while (1) { 
+        daycount += 1; 
+        dayofmonth += 1; 
+        if (daycount > days) { 
+            break; 
+        }
+        if (dayofmonth >=  getNumDaysInThisMonth(year, month)) { 
+            month++; 
+            dayofmonth = 0; 
+            if (month >= 12 ) { 
+                year++; 
+                month = 0; 
+            }
+        } 
+    }
+    timeofday(&clock, seconds - 60 * 60 * 24 * (daycount - 1)); 
+    //"January 23, 2014 15:57:07.123456"
+    fprintf(stdout, "%s %.2lu, %.4lu %.2u:%.2u:%.2u.%.6lu\n", 
+            toString(month), dayofmonth, year, 
+            clock.data.hour, 
+            clock.data.minute, 
+            clock.data.second, 
+            useconds
+            );
+}
+
+char * toString(int monthno){ 
+    static char * stringMonths[12]= { 
+        "January", 
+        "Febrauary", 
+        "March", 
+        "April", 
+        "May", 
+        "June", 
+        "July", 
+        "August", 
+        "September", 
+        "October", 
+        "November", 
+        "December"
+    }; 
+    assert(monthno < 12); 
+    return stringMonths[monthno]; 
+}
+
+
+void init(clock *clock){ 
+    clock->data.hour = 0; 
+    clock->data.minute = 0; 
+    clock->data.second =0; 
+}
+
+void timeofday(clock * clock, unsigned long seconds){ 
+    unsigned minutes = 0, hours = 0; 
+    assert(seconds <= 60 * 60 *  24); 
+    minutes = seconds / 60; 
+    hours = minutes / 60; 
+    clock->data.hour = hours; 
+    clock->data.minute = (seconds - (clock->data.hour * 60 * 60)) / 60; 
+    clock->data.second = (seconds - (clock->data.hour * 60 * 60) - 
+            clock->data.minute * 60); 
 }
 
 
