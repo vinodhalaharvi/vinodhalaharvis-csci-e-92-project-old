@@ -1,0 +1,61 @@
+			Last revised 29-Aug-15
+
+			    Problem Set 1
+
+		 Harvard Extension School CSCI E-92:
+	     Principles of Operating Systems - Fall 2015
+
+		 Due: Midnight on September 20, 2015
+
+
+As described in the syllabus, submit the solution to all problems in
+this Problem Set using "git" with the tag ps1-submit.
+
+1. (5 Points) Multiprogramming.  Tanenbaum 3/e 1.1 (Tanenbaum 2/e
+   1.2).  In additon, give at least two reasons for having
+   multiprogramming.
+
+   Multiprogramming is a computational methodology where a single CPU is timesharing different jobs submitted by the user. CPU computation is orders of magnitude faster than the disk or network IO. So every time one job has to perform this IO, the CPU can save the state of the job (including registers, memory address, etc) and run another job. If a job runs for too long with out performing IO then the OS scheduler can step in and temporarily suspend the job  and give the CPU resources to another job which can then run for a short time. This notion of time multiplexing the CPU among several jobs that can take turns and run is call Multiprogramming.
+
+    Examples: 
+    1) With out Multiprogramming there will be a signification wastage of CPU time when a job is waiting on IO to happen
+   2) A single ill formed job could bring the whole system job, for example a job that is waiting for a network packet to arrive, but never does. With Multiprogramming with premptive scheduler, the OS scheduler can intervene and give the CPU time slot to other job. With out this the hung job will be run for ever.
+
+
+2. (5 Points) Protected kernel mode operations.  Tanenbaum 3/e 1.7
+   (Tanenbaum 2/e 1.8).  In addition, for each subsection a-d,
+   describe what problems would be caused by allowing the instruction
+   to run when not in kernel mode.
+
+(a) Disable all interrupts
+should happen kernel mode. Interrupts are common to the entire system and we don't want a process to disable all interrupts that include the timer interrupt and thus disabling the OS scheduler to prempt the process when it's time slot is finished. No other process can run. 
+
+(b) Read the time-of-day clock
+Read operation is no problem and can be done in the user mode. 
+
+(c) set the time-of-day clock.
+Should only be done in kernel mode. There is a system clock that's shared by all the process in the system. The clock is not perprocess and so any process should not monopolize the clock by making changes to it. 
+
+(d) Change the memory map.
+Should only be done in kernel mode. Memory mapping as way of providing a multiprogramming abstration by the kernel to the user processes. So only kernel should be able to change the memory map. Other wise any user process can change any other user's memory map and thus compromising the multiprogramming paradigm. This is also a mojor security risk when one process is able to read other processes sensitive information.
+
+
+3. (5 Points) Priority inversion problem with priority scheduling
+   vs. round-robin scheduling.  Tanenbaum 3/e 2.20 (Tanenbaum 2/e
+   2.26)
+
+
+
+
+
+4. (10 Points) Implementing semaphores using a disable interrupts
+   instruction.  Tanenbaum 3/e 2.25 (Tanenbaum 2/e 2.23).  You must
+   include pseudo-code for your solution.
+
+5. (10 Points) Implementing counting semaphores using binary
+   semaphores.  Tanenbaum 3/e 2.26 (Tanenbaum 2/e 2.24).  You must
+   include pseudo-code for your solution.  By "ordinary machine
+   instructions," we mean all facilities that are available through
+   the C Programming Language, for example.  Your solution should use
+   binary semaphores wherever mutual exclusion is needed.
+
