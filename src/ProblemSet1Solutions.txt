@@ -11,17 +11,21 @@
 As described in the syllabus, submit the solution to all problems in
 this Problem Set using "git" with the tag ps1-submit.
 
+###############################################
+
+
 1. (5 Points) Multiprogramming.  Tanenbaum 3/e 1.1 (Tanenbaum 2/e
    1.2).  In additon, give at least two reasons for having
    multiprogramming.
 
-   Multiprogramming is a computational methodology where a single CPU is timesharing different jobs submitted by the user. CPU computation is orders of magnitude faster than the disk or network IO. So every time one job has to perform this IO, the CPU can save the state of the job (including registers, memory address, etc) and run another job. If a job runs for too long with out performing IO then the OS scheduler can step in and temporarily suspend the job  and give the CPU resources to another job which can then run for a short time. This notion of time multiplexing the CPU among several jobs that can take turns and run is call Multiprogramming.
+Multiprogramming is a computational methodology where a single CPU is timesharing different jobs submitted by the user. CPU computation is orders of magnitude faster than the disk or network IO. So every time one job has to perform this IO, the CPU can save the state of the job (including registers, memory address, etc) and run another job. If a job runs for too long with out performing IO then the OS scheduler can step in and temporarily suspend the job  and give the CPU resources to another job which can then run for a short time. This notion of time multiplexing the CPU among several jobs that can take turns and run is call Multiprogramming.
 
-    Examples: 
-    1) With out Multiprogramming there will be a signification wastage of CPU time when a job is waiting on IO to happen
-   2) A single ill formed job could bring the whole system job, for example a job that is waiting for a network packet to arrive, but never does. With Multiprogramming with premptive scheduler, the OS scheduler can intervene and give the CPU time slot to other job. With out this the hung job will be run for ever.
+Examples: 
+1) With out Multiprogramming there will be a significant wastage of CPU time when a job is waiting on IO to happen
+2) A single ill formed job could bring the whole system job, for example a job that is waiting for a network packet to arrive, but never does. With Multiprogramming with premptive scheduler, the OS scheduler can intervene and give the CPU time slot to other job. With out this the hung job will be run for ever.
 
 
+###############################################
 2. (5 Points) Protected kernel mode operations.  Tanenbaum 3/e 1.7
    (Tanenbaum 2/e 1.8).  In addition, for each subsection a-d,
    describe what problems would be caused by allowing the instruction
@@ -39,18 +43,47 @@ Should only be done in kernel mode. There is a system clock that's shared by all
 (d) Change the memory map.
 Should only be done in kernel mode. Memory mapping as way of providing a multiprogramming abstration by the kernel to the user processes. So only kernel should be able to change the memory map. Other wise any user process can change any other user's memory map and thus compromising the multiprogramming paradigm. This is also a mojor security risk when one process is able to read other processes sensitive information.
 
+###############################################
+
 
 3. (5 Points) Priority inversion problem with priority scheduling
    vs. round-robin scheduling.  Tanenbaum 3/e 2.20 (Tanenbaum 2/e
    2.26)
+No. This problem will no happen if the round-robin scheduling is used, since the low Priority process L will eventually get it's time slot to run unlike the Priority scheduling where the low Priority process will never get a chance to run since the high priority process is doing a busy wait and so will never be prempted. 
 
-
-
+###############################################
 
 
 4. (10 Points) Implementing semaphores using a disable interrupts
    instruction.  Tanenbaum 3/e 2.25 (Tanenbaum 2/e 2.23).  You must
    include pseudo-code for your solution.
+
+down:
+    CALL disable_interrupts
+    LOAD reg semaphore
+    CMP reg, #0
+    JNE ok
+    CALL enable_interrupts
+    CALL scheduler
+    JMP down
+ok: 
+    DECR reg
+    STORE reg semaphore
+    CALL enable_interrupts
+    JMP done
+
+up: 
+    CALL disable_interrupts
+    LOAD reg semaphore
+    INCR reg
+    STORE reg semaphore
+    CALL enable_interrupts
+    JMP done
+done: 
+    RET
+###############################################
+
+
 
 5. (10 Points) Implementing counting semaphores using binary
    semaphores.  Tanenbaum 3/e 2.26 (Tanenbaum 2/e 2.24).  You must
@@ -58,4 +91,26 @@ Should only be done in kernel mode. Memory mapping as way of providing a multipr
    instructions," we mean all facilities that are available through
    the C Programming Language, for example.  Your solution should use
    binary semaphores wherever mutual exclusion is needed.
+//counting semaphore using binary semaphore
+semaphore mutex = 1; 
+int count = 0; 
+countdown(){ 
+    down(&mutex); 
+    incr(count); 
+    up(&mutex); 
+}
+
+countup(){ 
+    down(&mutex); 
+    decr(count); 
+    up(&mutex); 
+}
+###############################################
+
+
+6. (65 Points) Simple Shell Implementation
+Please see below how to run
+make shell
+./shell
+###############################################
 
