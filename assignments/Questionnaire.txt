@@ -6,61 +6,58 @@
 			      Fall 2015
 
 
-Name:				Home phone number:
-
-
-E-mail:				Work phone number:
-
+Name:			   Vinod Halaharvi     
+Home phone number: (904) 200 1070
+Work phone number: (904) 200 1070 
+E-mail:			   vinod.halaharvi@gmail.com 
 
 Occupation (If an undergraduate student, please specify your major and
 year and at which school; If a graduate student, please specify your
 department, field, and year and at which school):
-
+Harvard Extension School, Concentration Software Engineering 4th year.
 
 Have you taken CSCI E-10a (Formerly CSCI E-50a), CSCI E-10b (Formerly
 CSCI E-50b), CSCI E-22 (Formerly CSCI E-119), and/or CSCI E-28
 (Formerly CSCI E-215) (specify which)?
-
+CSCIE-22, CSCIE-28, CSCI E-10b
 
 Do you have experience using Unix?  Do you have experience programming
-using Unix system calls?
-
-	If not, how do you meet the prerequisite?
-
+using Unix system calls?  If not, how do you meet the prerequisite?
+Yes
 
 Are you already registered for this class?  -- If not, do you intend
 to register?
-
+Already registered
 
 Are you taking the course for graduate credit?
+Yes
 
 If section cannot be held on Tuesday evening, on which other evening
 would you prefer section be held?  Circle preferred evenings.
-
-        Monday   Wecdnesday   Thursday
+Monday   Wecdnesday   Thursday
+Any day is fine for me. I am a distant online student.
 
 What appropriate course or work experience do you have?
-
-
+Computer Architecture CS93
+Compiler Design CS95
 
 What is your math background?
-
+I have OK  math ground, I have taken few math classes in undergrad and grad school.
 
 What computer languages do you know (please include assembler and
-high-level languages)?  Have you programmed in the C Programming
-Language?
-
+high-level languages)?  Have you programmed in the C Programming Language?
+C, Python
 
 What operating systems have you used (e.g. Windows, Mac OS, Linux, etc.)?
-
+Windows, Mac, Linux
 
 What computers have you used (i.e., which machine language instruction sets)?
-
+X86, PowerpC
 
 Why are you taking the course?
-
+OS is a core computer science course and so very important to take this before graduating. 
 
 If the class needs to be rescheduled, is Thursday evening acceptable?
-
+Yes
 
 Other comments (please continue on the back):
