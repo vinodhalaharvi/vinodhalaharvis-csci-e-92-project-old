@@ -8,9 +8,15 @@
 #include "shell.h"
 #include "limits.h"
 #define MAX_STRING_LENGTH 1000
+#define MAX_COMMAND_LINE_ARGUMENTS 100
 
 boolean isline(char line[LINE_MAX +1]) ; 
 static int inside_double_quote = 0; 
+
+typedef enum {
+    SUCCESS, 
+    COMMAND_NOT_FOUND
+} error;
 
 //"January 23, 2014 15:57:07.123456".  "date" will call'
 char * months[12]= { 
@@ -44,7 +50,10 @@ struct commandEntry {
 };
 static node_type * env = NULL; 
 
-int main(int argc, char *argv[]) {
+int main() {
+    int argc; 
+    char *argv[MAX_COMMAND_LINE_ARGUMENTS]; 
+    //argc = (char *) malloc(MAX_COMMAND_LINE_ARGUMENTS); 
     int i; 
     char line[LINE_MAX + 1];
     int c, index;
@@ -64,13 +73,15 @@ int main(int argc, char *argv[]) {
         assert(!inside_double_quote); 
         line[index] = '\0';
         if (ferror(stdin)) {
-            fprintf(stderr, "error while reading line: %s\n", strerror(errno));
+            fprintf(stderr, "Error while reading line: %s\n", strerror(errno));
+            exit(EXIT_FAILURE); 
             return 1;
         } else {
             process_line(line, &argc, argv);
             index = 0; 
         }
     }
+    exit(EXIT_SUCCESS); 
 }
 
 char *join(char * stringArray[], char * delimiter){ 
@@ -97,6 +108,7 @@ int cmd_date(int argc, char *argv[]){
     unsigned long  seconds, minutes, hours; 
     unsigned long  useconds; 
     unsigned long days; 
+    assert(argc == 1); 
     memset(&time_value, '\0', sizeof(struct timeval)); 
     result = gettimeofday(&time_value, NULL); 
     assert(result == 0); 
@@ -110,6 +122,7 @@ int cmd_date(int argc, char *argv[]){
 }
 
 int cmd_echo(int argc, char *argv[]){ 
+    assert(argc > 0); 
     argv[argc] = NULL; 
     fprintf(stdout, "%s\n", join(++argv, " ")); 
     return 0;
@@ -158,7 +171,6 @@ int cmd_exit(int argc, char *argv[]){
     long exit_code; 
     if (argc > 1) { 
         exit_code = toLong(argv[1], 10); 
-        assert(0); 
         exit(exit_code); 
     } else { 
         exit(0); 
@@ -167,6 +179,7 @@ int cmd_exit(int argc, char *argv[]){
 }
 
 int cmd_help(int argc, char *argv[]){ 
+    assert(argc == 1); 
     fprintf(stdout, "%s\n", "The following commands are available");
     int i = 0; 
     while(commands[i].name){ 
@@ -181,14 +194,11 @@ int  process_line(char line[LINE_MAX + 1], int *argc, char * argv[]) {
     if (!isline(line)){ 
         return 0;  
     }
-    //split(line, " ", argc, argv); 
     splitString(line, ' ', argv, argc); 
-    //printStringArray(argv, *argc); 
     result = do_command(line, argc, argv); 
     if (result != 0){ 
-        print_error(line, argc, argv); 
+        fprintf(stderr, "Non zero return value of %d while running command, %s\n", result, line); 
     }
-    //memory_free(line, argc, argv); 
     return result;
 }
 
@@ -240,7 +250,7 @@ int do_command(char line[LINE_MAX + 1], int *argc, char * argv[]){
     //assert(func); 
     if (func == NULL){ 
         fprintf(stderr, "Command %s not found \n", argv[0]); 
-        result = 127; 
+        result = COMMAND_NOT_FOUND; 
     } else { 
         result = func(*argc, argv); 
     }
@@ -255,12 +265,6 @@ void memory_free(char line[LINE_MAX +1], int *argc, char * argv[]){
     free(argv); 
     return;
 }
-
-void print_error(char line[LINE_MAX +1], int *argc, char * argv[]){ 
-    fprintf(stderr, "Error running command .. %s\n", line); 
-    return;
-}
-
 
 void print_boolean(boolean bool){ 
     switch (bool) {
@@ -361,25 +365,39 @@ void double_quote_check(int *ch){
 }
 
 
-/* 
-int howmany;
-char *store[10]; 
-char delimiter = ' ';
-splitString(string, delimiter, store, &howmany);  
-*/
-void splitString(char * string, char delimiter, char *store[10], int *howmany){ 
+char *  clobberspaces(char * src, char delimiter){ 
+    int i =0, j =0;  
+    assert(src); 
+    char * dst = (char *) malloc(strlen(src)); 
+    memset(dst, '\0', strlen(src)); 
+    while(src[i]){ 
+        if (!(src[i] == delimiter && src[i+1] == delimiter ))
+            dst[j++] = src[i];  
+        i++; 
+    }
+    dst[j] = '\0'; 
+    return dst;
+}
+
+
+void splitString(char * string, char delimiter, 
+        char *store[MAX_COMMAND_LINE_ARGUMENTS], 
+        int *howmany){ 
     int i = 0; 
-    int argc = 0; 
-    char * head = string; 
+    int argc = 0;
+    char * clbrstring; 
+    char * head; 
     assert (string); 
+    clbrstring = clobberspaces(string, ' ');
+    head = clbrstring; 
     *howmany = 0; 
-    while(string[i]){ 
-        if (string[i] ==  delimiter && string[i+1] != delimiter) { 
-            assert(argc < 9); 
-            string[i++] = '\0'; 
-            store[argc++] = head; 
+    while(clbrstring[i]){ 
+        if (clbrstring[i] ==  delimiter && clbrstring[i+1] != delimiter) { 
+            assert(argc < MAX_COMMAND_LINE_ARGUMENTS); 
+            clbrstring[i++] = '\0'; 
+            store[argc++] = strdup(head); 
             (*howmany)++; 
-            head = string + i; 
+            head = clbrstring + i; 
         }
         i++; 
     }
@@ -417,8 +435,8 @@ int getNumDaysInThisMonth(long year, long month){
 void calendar(unsigned long days, 
     unsigned long seconds, unsigned long useconds){ 
     unsigned long year = 1970, month = 0; 
-    unsigned long daycount = 1; 
-    unsigned long dayofmonth = 0; 
+    unsigned long daycount = 0; 
+    unsigned long dayofmonth = 1; 
     unsigned long secondcount = 0; 
     long minutes, hours; 
     long months, years;
@@ -426,19 +444,19 @@ void calendar(unsigned long days,
     while (1) { 
         daycount += 1; 
         dayofmonth += 1; 
-        if (daycount > days) { 
+        if (daycount == days) { 
             break; 
         }
-        if (dayofmonth >=  getNumDaysInThisMonth(year, month)) { 
+        if (dayofmonth >  getNumDaysInThisMonth(year, month)) { 
             month++; 
-            dayofmonth = 0; 
+            dayofmonth = 1; 
             if (month >= 12 ) { 
                 year++; 
                 month = 0; 
             }
         } 
     }
-    timeofday(&clock, seconds - 60 * 60 * 24 * (daycount - 1)); 
+    timeofday(&clock, seconds - 60 * 60 * 24 * daycount); 
     //"January 23, 2014 15:57:07.123456"
     fprintf(stdout, "%s %.2lu, %.4lu %.2u:%.2u:%.2u.%.6lu\n", 
             toString(month), dayofmonth, year, 
@@ -485,5 +503,3 @@ void timeofday(clock * clock, unsigned long seconds){
     clock->data.second = (seconds - (clock->data.hour * 60 * 60) - 
             clock->data.minute * 60); 
 }
-
-
