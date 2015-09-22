@@ -4,6 +4,10 @@
 #include "map.h"
 #include <assert.h>
 
+//Author: Vinod Halaharvi
+//Very rudimentary doubly linked list 
+//to keep track of environment variables
+
 /*int main(int argc, char *argv[])
 {
     node_type * environ = NULL; 
@@ -14,13 +18,13 @@
     assert(contains(environ, "key1") == true); 
     assert(contains(environ, "key2") == true); 
     assert(contains(environ, "key3") == true); 
-
     delete(&environ, "key2"); 
     assert(contains(environ, "key2") == false); 
     print(environ); 
     return 0; 
 }*/
 
+//helper function to print the list
 void print(node_type * environ){
     int i = 0;  
     while(environ){
@@ -29,6 +33,7 @@ void print(node_type * environ){
     }
 }
 
+//get the value for a given key
 value_type get(node_type * node, key_type key){
     int i = 0;  
     while(node){
@@ -40,6 +45,8 @@ value_type get(node_type * node, key_type key){
     return NULL; 
 }
 
+//nothing is freed yet. 
+//will implement in future release
 void freenode(node_type * node){ 
     free(node->key); 
     free(node->value); 
@@ -48,6 +55,9 @@ void freenode(node_type * node){
     free(node); 
 }
 
+
+//delete from the list
+//many edge cases to consider
 void delete(node_type **head, key_type key){
     int i = 0;  
     node_type * node = *head; 
@@ -87,6 +97,7 @@ void delete(node_type **head, key_type key){
 }
 
 
+//put the key, value pair in this list
 node_type * put(node_type * node, key_type key, value_type value){
     node_type * temp = (node_type *) malloc(sizeof(node_type)); 
     memset(temp, '\0', sizeof(node_type)); 
@@ -104,10 +115,13 @@ node_type * put(node_type * node, key_type key, value_type value){
     return temp; 
 }
 
+
+//simple helper function for string equals
 boolean match(key_type key, key_type otherkey) { 
     return (strcmp(key, otherkey) == 0)? 1 : 0; 
 }
  
+//check if list contains the key
 boolean contains(node_type * node, key_type key){
     int i = 0;  
     while(node){
@@ -118,4 +132,3 @@ boolean contains(node_type * node, key_type key){
     }
     return false; 
 }
- 

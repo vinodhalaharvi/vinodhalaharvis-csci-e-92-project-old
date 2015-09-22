@@ -10,15 +10,19 @@
 #define MAX_STRING_LENGTH 1000
 #define MAX_COMMAND_LINE_ARGUMENTS 100
 
+//Vinod Halaharvi
+//HUID: 80778287
+//vinod.halaharvi@gmail.com, (904) 200 1070
 boolean isline(char line[LINE_MAX +1]) ; 
 static int inside_double_quote = 0; 
 
+//Enumerator for error codes for this shell
 typedef enum {
     SUCCESS, 
     COMMAND_NOT_FOUND
 } error;
 
-//"January 23, 2014 15:57:07.123456".  "date" will call'
+// Months string literals
 char * months[12]= { 
     "January", 
     "Febrauary", 
@@ -34,9 +38,8 @@ char * months[12]= {
     "December"
 }; 
 
-int lmonthdays[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; 
-int nlmonthdays[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; 
 
+// string to function object map
 struct commandEntry {
     char *name;
     int (*functionp)(int , char *[]);
@@ -48,12 +51,18 @@ struct commandEntry {
     {"set", cmd_set}, 
     {NULL, NULL}
 };
+
+//each node will store a name value pair mapping
+//of the environment variable
 static node_type * env = NULL; 
 
+
+//prompt a '$' and wait for user input
+//until a newline and then process the line 
+//and optionally print code if error happened
 int main() {
     int argc; 
-    char *argv[MAX_COMMAND_LINE_ARGUMENTS]; 
-    //argc = (char *) malloc(MAX_COMMAND_LINE_ARGUMENTS); 
+    char **argv; 
     int i; 
     char line[LINE_MAX + 1];
     int c, index;
@@ -81,9 +90,26 @@ int main() {
             index = 0; 
         }
     }
+    free(argv); 
     exit(EXIT_SUCCESS); 
 }
 
+
+//currently nothing is being freed. 
+//free feature is missing. Use of strdup is causing 
+//issues during free. Will have to get rid of it
+//to make free working
+void myfree(char *array[], unsigned howmany){ 
+    assert(array); assert( (int) howmany > 0); 
+    int i = 0; 
+    for (i = 0; i < howmany; ++i) {
+        free(array[i]); 
+    }
+    return; 
+}
+
+
+//not an ideal implementation, but gets the job done
 char *join(char * stringArray[], char * delimiter){ 
     char * result = (char *) malloc(1000); 
     char * base = result; 
@@ -102,6 +128,11 @@ char *join(char * stringArray[], char * delimiter){
     return base;
 }
 
+
+//wrote this date function from scratch
+//first get the number of days since epoch 
+//and then pass days to the calendar function 
+//to print the current date. 
 int cmd_date(int argc, char *argv[]){ 
     int result;
     struct timeval time_value; 
@@ -117,10 +148,13 @@ int cmd_date(int argc, char *argv[]){
     minutes = seconds/60; 
     hours =  minutes/60; 
     days =  hours/24;
+    //calendar function to convert from epoch days 
+    //to current datetime in the current locale
     calendar(days, seconds, useconds); 
     return 0; 
 }
 
+//echo command implementation
 int cmd_echo(int argc, char *argv[]){ 
     assert(argc > 0); 
     argv[argc] = NULL; 
@@ -128,6 +162,10 @@ int cmd_echo(int argc, char *argv[]){
     return 0;
 }
 
+//environment variables are not fully implemented
+//like variable replacements are not implemented, 
+//but set is working and set without any arguments
+//is working as well
 int cmd_set(int argc, char *argv[]){ 
     char *values[2]; 
     int count = 0; 
@@ -144,6 +182,8 @@ int cmd_set(int argc, char *argv[]){
     return 0;
 }
 
+//helper function to convert to long
+//with error checking
 long toLong(char * string, int base){ 
         /* Code from strtol man page documentation */
        char * endptr; 
@@ -155,6 +195,9 @@ long toLong(char * string, int base){
        assert (endptr != string); 
 }
 
+
+//helper function to convert to unsigned long
+//with error checking
 long toUnsignedLong(char * string, int base){ 
         /* Code from strtol man page documentation */
        errno = 0; 
@@ -167,6 +210,8 @@ long toUnsignedLong(char * string, int base){
 } 
 
 
+//call exit system call with passed in 
+//error code
 int cmd_exit(int argc, char *argv[]){ 
     long exit_code; 
     if (argc > 1) { 
@@ -178,6 +223,8 @@ int cmd_exit(int argc, char *argv[]){
     return 0;
 }
 
+
+//show very simple help of all commands
 int cmd_help(int argc, char *argv[]){ 
     assert(argc == 1); 
     fprintf(stdout, "%s\n", "The following commands are available");
@@ -189,19 +236,34 @@ int cmd_help(int argc, char *argv[]){
     return 0;
 }
 
+//process each line
 int  process_line(char line[LINE_MAX + 1], int *argc, char * argv[]) {
     int result; 
+
+    //is the line empty
     if (!isline(line)){ 
         return 0;  
     }
-    splitString(line, ' ', argv, argc); 
+
+    //split the line and generate argv
+    //and also populate the number of arguments as well
+    //note here argc is a integer pointer 
+    //and will be filled by splitString function
+    splitString(line, ' ', &argv, argc); 
+
+    //now we are ready to run the command
+    //and get the result. 0 result is successful exec 
+    //and non 0 is a failed exec
     result = do_command(line, argc, argv); 
     if (result != 0){ 
-        fprintf(stderr, "Non zero return value of %d while running command, %s\n", result, line); 
+        fprintf(stderr, 
+                "Non zero return value of %d while running command, %s\n", result, line); 
     }
     return result;
 }
 
+
+//helper function to check if line is empty 
 boolean isline(char line[LINE_MAX +1]){ 
     int i = 0; 
     assert(line); 
@@ -215,6 +277,9 @@ boolean isline(char line[LINE_MAX +1]){
 }
 
 
+//helper function to split
+//don't like the strtok, and will be removed 
+//in the future psets
 void split(char line[LINE_MAX +1], char * delimiter, int *argc, char *argv[]){
     char *string; 
     string = strtok(line, delimiter); 
@@ -229,7 +294,11 @@ void split(char line[LINE_MAX +1], char * delimiter, int *argc, char *argv[]){
     return; 
 }
 
-command_func_type get_command_function(char line[LINE_MAX+1], int *argc, char * argv[]){ 
+
+//look function object using function name 
+//and return the function pointer
+command_func_type get_command_function(char line[LINE_MAX+1], 
+        int *argc, char * argv[]){ 
     command_func_type func; 
     int i =0; 
     while(commands[i].name != NULL){ 
@@ -241,6 +310,9 @@ command_func_type get_command_function(char line[LINE_MAX+1], int *argc, char * 
     return NULL; 
 }
 
+//look up the command and get Command function pointer
+//and exec the command. get the result and return the 
+//result
 int do_command(char line[LINE_MAX + 1], int *argc, char * argv[]){ 
     int (*func)(int argc, char * argv[]); 
     int result; 
@@ -257,15 +329,7 @@ int do_command(char line[LINE_MAX + 1], int *argc, char * argv[]){
     return result; 
 }
 
-void memory_free(char line[LINE_MAX +1], int *argc, char * argv[]){ 
-    int i;
-    for (i = 0; i < *argc; ++i) {
-        free(argv[i]); 
-    }
-    free(argv); 
-    return;
-}
-
+//helper to print boolean
 void print_boolean(boolean bool){ 
     switch (bool) {
         case false:
@@ -280,30 +344,16 @@ void print_boolean(boolean bool){
 }
 
 
-time_t minutes(time_t seconds){ 
-    return   seconds/60; 
-}
-
-time_t hours(time_t seconds){ 
-    return minutes(seconds)/60; 
-}
-
-time_t days(time_t seconds){
-    return hours(seconds)/24; 
-}
-
 /*functions.  Keep in mind that some years are leap years and others
 are not.  Leap years contain 366 days (February 29th) and all other
 years contain 365 days.  Every year that is evenly divisible by
 four is a leap year, except that every year divisible by 100 is not
 a leap year, except that every year divisible by 400 is a leap
 year.
-
 assert(is_leap_year(1900) == false); 
 assert(is_leap_year(2011) == false); 
 assert(is_leap_year(2000) == true); 
 */
-
 boolean is_leap_year(int yearno){ 
     if (yearno % 4 == 0 ){ 
         if (yearno % 100 == 0){ 
@@ -318,10 +368,13 @@ boolean is_leap_year(int yearno){
     }
 }
 
+//simple helper function
 boolean isSlash(char ch){ 
     return ch == '\\'; 
 }
 
+
+//escape character support
 char subescapse_char(char ch){ 
     switch (ch) {
         case '0': return '\0'; 
@@ -333,15 +386,7 @@ char subescapse_char(char ch){
         case 'r': return '\r';
         case 't': return '\t'; 
         case 'v': return '\v';
-        /*case 'a': return 7; 
-        case 'b': return 8; 
-        case 'e': return 27;
-        case 'f': return 12;
-        case 'n': return 10;
-        case 'r': return 13;
-        case 't': return 9; 
-        case 'v': return 11;
-        default: return ch; */
+        default: return ch;
     }
 }
 
@@ -356,15 +401,21 @@ double-quote within the field, (2) implement the following
 backslash escape notation to allow special characters within a
 double-quoted string. 
 */
+//double quotes is not completely working
+//specially the edge cases, but is working 
+//for most part
 void double_quote_check(int *ch){ 
     if (*ch == 34){ 
-        while ((*ch = fgetc(stdin)) == 34); 
+        //clobber consecutive double quotes
+        while ((*ch = fgetc(stdin)) == 34);  
+
+        //toggle every time we see a non consecutive double quote
         inside_double_quote = !inside_double_quote; 
     }
     return; 
 }
 
-
+//clobber consecutive spaces 
 char *  clobberspaces(char * src, char delimiter){ 
     int i =0, j =0;  
     assert(src); 
@@ -379,39 +430,64 @@ char *  clobberspaces(char * src, char delimiter){
     return dst;
 }
 
-
+//split string and populate store (argc) and argc
+//howmany = argc
 void splitString(char * string, char delimiter, 
-        char *store[MAX_COMMAND_LINE_ARGUMENTS], 
+        char **store[], 
         int *howmany){ 
     int i = 0; 
     int argc = 0;
     char * clbrstring; 
     char * head; 
     assert (string); 
+    //remove consecutive spaces
     clbrstring = clobberspaces(string, ' ');
     head = clbrstring; 
     *howmany = 0; 
+    unsigned argcount = 0; 
+
+    // count the number of arguments first
+    while(clbrstring[i]){ 
+        if (clbrstring[i] ==  delimiter 
+                && clbrstring[i+1] != delimiter) { 
+            argcount++; 
+        } 
+        i++; 
+    }
+
+    //allocate space for argcount number of arguments
+    *store = (char **) malloc((argcount+1) * sizeof(char *)); 
+    (*store)[argcount] = NULL; 
+
+    //create argv now
+    i = 0;
     while(clbrstring[i]){ 
         if (clbrstring[i] ==  delimiter && clbrstring[i+1] != delimiter) { 
+            //this is some arbitrary limit
             assert(argc < MAX_COMMAND_LINE_ARGUMENTS); 
             clbrstring[i++] = '\0'; 
-            store[argc++] = strdup(head); 
+            //don't like strdup, but for now 
+            (*store)[argc++] = strdup(head);  //not sure if strdup is allowed?
             (*howmany)++; 
             head = clbrstring + i; 
         }
         i++; 
     }
+
+    //edge case
     if (!argc){ 
-        store[0] = string; 
+        (*store)[0] = string; 
         *howmany = 1; 
-        store[1] = NULL; 
+        (*store)[1] = NULL; 
     } else { 
-        store[argc++] = head; 
+        (*store)[argc++] = head; 
         (*howmany)++; 
-        store[argc] = NULL; 
+        (*store)[argc] = NULL; 
     }
 }
 
+
+//helper function to print array of strings to console
 void printStringArray(char *stringArray[], int howmany){ 
     assert(stringArray); 
     int i =0; 
@@ -422,7 +498,11 @@ void printStringArray(char *stringArray[], int howmany){
 }
 
 
+//get how many days in a month
+//# of days in a month depends on if the year is a leap year
 int getNumDaysInThisMonth(long year, long month){ 
+    //static map of leap month days (lmdays)  and  
+    //nonleap month days (nlmdays)
     static int lmdays[] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31} ; 
     static int nlmdays[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; 
     if (is_leap_year(year)){ 
@@ -432,6 +512,10 @@ int getNumDaysInThisMonth(long year, long month){
     }
 }
 
+
+//convert epoch days to calendar date in the current locale.
+//the residue of the seconds left after the day conversion 
+//should be the time of today
 void calendar(unsigned long days, 
     unsigned long seconds, unsigned long useconds){ 
     unsigned long year = 1970, month = 0; 
@@ -456,7 +540,11 @@ void calendar(unsigned long days,
             }
         } 
     }
+    //total seconds minus the seconds of the days so far 
+    //will give us time since this day started 
+    //which is also the current time of the day
     timeofday(&clock, seconds - 60 * 60 * 24 * daycount); 
+
     //"January 23, 2014 15:57:07.123456"
     fprintf(stdout, "%s %.2lu, %.4lu %.2u:%.2u:%.2u.%.6lu\n", 
             toString(month), dayofmonth, year, 
@@ -467,6 +555,8 @@ void calendar(unsigned long days,
             );
 }
 
+
+//simple helper function
 char * toString(int monthno){ 
     static char * stringMonths[12]= { 
         "January", 
@@ -486,13 +576,15 @@ char * toString(int monthno){
     return stringMonths[monthno]; 
 }
 
-
+//initialize the close
 void init(clock *clock){ 
     clock->data.hour = 0; 
     clock->data.minute = 0; 
     clock->data.second =0; 
 }
 
+//take the number of residual seconds since this day started
+//and convert to the time of this day
 void timeofday(clock * clock, unsigned long seconds){ 
     unsigned minutes = 0, hours = 0; 
     assert(seconds <= 60 * 60 *  24); 
