@@ -172,7 +172,6 @@ int cmd_set(int argc, char *argv[]){
     if (match(argv[0], "set")){ 
         if (argc == 1){ 
             print(env); 
-            return; 
         } else { 
             split(argv[1], "=", &count, values); 
             assert(count == 2); 
