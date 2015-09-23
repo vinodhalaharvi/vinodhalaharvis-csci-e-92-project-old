@@ -1,0 +1,38 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+DATASTARTADDR	src/mymalloc.c	14;"	d	file:
+HEADERSTARTADDR	src/mymalloc.c	13;"	d	file:
+MAX_COMMAND_LINE_ARGUMENTS	src/mymalloc.c	10;"	d	file:
+MAX_LIST_SIZE	src/mymalloc.c	11;"	d	file:
+MAX_STRING_LENGTH	src/mymalloc.c	9;"	d	file:
+_MYMALLOC_H	src/mymalloc.h	2;"	d
+_mymalloc_t	src/mymalloc.h	/^typedef struct _mymalloc_t {$/;"	s
+addr	src/mymalloc.h	/^    void * addr; $/;"	m	struct:_mymalloc_t
+available	src/mymalloc.h	/^    boolean available; $/;"	m	struct:_mymalloc_t
+boolean	src/mymalloc.h	/^typedef enum { false, true } boolean; $/;"	t	typeref:enum:__anon1
+booltostring	src/mymalloc.c	/^char * booltostring(boolean bool){ $/;"	f
+false	src/mymalloc.h	/^typedef enum { false, true } boolean; $/;"	e	enum:__anon1
+getcurrentprocessid	src/mymalloc.c	/^unsigned getcurrentprocessid(){ $/;"	f
+hole	src/mymalloc.c	/^boolean hole(mymalloc_t * node){ $/;"	f
+initmemory	src/mymalloc.c	/^void initmemory(){ $/;"	f
+main	src/mymalloc.c	/^int main(int argc, char *argv[])$/;"	f
+merge	src/mymalloc.c	/^void merge(mymalloc_t *node){ $/;"	f
+myMalloc	src/mymalloc.c	/^void *myMalloc(unsigned size){ $/;"	f
+myfree	src/mymalloc.c	/^void myfree(void *ptr){ $/;"	f
+mymalloc_t	src/mymalloc.h	/^} mymalloc_t;$/;"	t	typeref:struct:_mymalloc_t
+next	src/mymalloc.h	/^    struct _mymalloc_t * next; $/;"	m	struct:_mymalloc_t	typeref:struct:_mymalloc_t::_mymalloc_t
+node	src/mymalloc.h	/^mymalloc_t * node; $/;"	v
+nodefree	src/mymalloc.c	/^void nodefree(mymalloc_t *node){ $/;"	f
+pid	src/mymalloc.h	/^    unsigned pid; $/;"	m	struct:_mymalloc_t
+prev	src/mymalloc.h	/^    struct _mymalloc_t * prev; $/;"	m	struct:_mymalloc_t	typeref:struct:_mymalloc_t::_mymalloc_t
+printmemory	src/mymalloc.c	/^void printmemory(mymalloc_t * node){ $/;"	f
+printnode	src/mymalloc.c	/^void printnode(mymalloc_t * node) { $/;"	f
+size	src/mymalloc.h	/^    unsigned size; $/;"	m	struct:_mymalloc_t
+split	src/mymalloc.c	/^void split(mymalloc_t * node, unsigned size){ $/;"	f
+totaldatasize	src/mymalloc.c	/^static unsigned long totaldatasize = ((1 * 1024 * 1024 * 8) \/ 32) * 31;$/;"	v	file:
+totalmemorysize	src/mymalloc.c	/^static unsigned long totalmemorysize = (1 * 1024 * 1024 * 8);  $/;"	v	file:
+true	src/mymalloc.h	/^typedef enum { false, true } boolean; $/;"	e	enum:__anon1

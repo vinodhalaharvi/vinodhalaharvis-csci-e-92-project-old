@@ -1,5 +1,5 @@
 #ifndef _SHELL_H
-#define _SHELL_H value
+#define _SHELL_H 1
 //header file for shell.c
 const int LINE_MAX = 256;
 typedef int (*command_func_type) (int argc, char * argv[]); 

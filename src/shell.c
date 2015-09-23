@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <string.h>
 #include <assert.h>
+#include <sys/time.h>
 #include "map.h"
 #include "shell.h"
 #include "limits.h"
@@ -62,8 +63,7 @@ static node_type * env = NULL;
 //and optionally print code if error happened
 int main() {
     int argc; 
-    char **argv; 
-    int i; 
+    char **argv = NULL; 
     char line[LINE_MAX + 1];
     int c, index;
     index = 0;
@@ -192,21 +192,9 @@ long toLong(char * string, int base){
        assert (!(errno == ERANGE && (val == LONG_MAX || val == LONG_MIN))
                || (errno != 0 && val == 0)); 
        assert (endptr != string); 
+       return val; 
 }
 
-
-//helper function to convert to unsigned long
-//with error checking
-long toUnsignedLong(char * string, int base){ 
-        /* Code from strtol man page documentation */
-       errno = 0; 
-       char * endptr; 
-       long val; 
-       val = strtoul(string, &endptr, base);
-       assert (!(errno == ERANGE && (val == LONG_MAX || val == LONG_MIN))
-               || (errno != 0 && val == 0)); 
-       assert (endptr != string); 
-} 
 
 
 //call exit system call with passed in 
@@ -298,7 +286,6 @@ void split(char line[LINE_MAX +1], char * delimiter, int *argc, char *argv[]){
 //and return the function pointer
 command_func_type get_command_function(char line[LINE_MAX+1], 
         int *argc, char * argv[]){ 
-    command_func_type func; 
     int i =0; 
     while(commands[i].name != NULL){ 
         if (strcmp(commands[i].name, argv[0]) == 0 ){ 
@@ -520,9 +507,6 @@ void calendar(unsigned long days,
     unsigned long year = 1970, month = 0; 
     unsigned long daycount = 0; 
     unsigned long dayofmonth = 1; 
-    unsigned long secondcount = 0; 
-    long minutes, hours; 
-    long months, years;
     clock clock; 
     while (1) { 
         daycount += 1; 
