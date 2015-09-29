@@ -6,6 +6,8 @@
 #include <assert.h>
 #include "limits.h"
 #include "mymalloc.h"
+#include "listgraph.h"
+
 #define MAX_STRING_LENGTH 1000
 #define MAX_COMMAND_LINE_ARGUMENTS 100
 #define MAX_LIST_SIZE 1000
@@ -17,16 +19,28 @@
 //HUID: 80778287
 //(904) 200 1070
 
-static unsigned long totalmemorysize = (1 * 1024 * 1024 * 8);  
+//static unsigned long totalmemorysize = (1 * 1024 * 1024 * 8);  
 //static unsigned long totalheadersize = (1 * 1024 * 1024 * 8) / 32; 
-static unsigned long totaldatasize = ((1 * 1024 * 1024 * 8) / 32) * 31;
+//static unsigned long totaldatasize = ((1 * 1024 * 1024 * 8) / 32) * 31;
+
+static unsigned long totalmemorysize = 1024 * 8; 
+static unsigned long totalheadersize = 512 * 1; 
+static unsigned long totaldatasize = 1024 * 8  - 512; 
+static mymalloc_t * node; 
+
+void * align(void * addr){ 
+    return (void *)(((unsigned)addr + 7) & (~7)); 
+}
 
 void initmemory(){ 
     node = (mymalloc_t *) malloc(totalmemorysize);
     assert(node); 
     memset(node, '\0', totalmemorysize); 
-    node->addr = 0; 
+    node->addr = align((void *)node + totalheadersize); 
+    /*fprintf(stdout, "node, align(node), node->addr: %p, %p, %p\n", 
+            node, align((void*)node), node->addr);*/
     node->available = true; 
+    node->pid = 0;
     node->next = NULL; 
     node->prev = NULL; 
     node->size = totaldatasize; 
@@ -102,30 +116,52 @@ void merge(mymalloc_t *node){
     return; 
 }
 
-void split(mymalloc_t * node, unsigned size){ 
+mymalloc_t *  split(mymalloc_t * node, unsigned size){ 
     mymalloc_t * temp; 
+    assert(node); 
     assert(node->size >= size); 
-    temp = (mymalloc_t *) malloc(sizeof(mymalloc_t)); 
-    assert(temp); 
+    //temp = (mymalloc_t *) malloc(sizeof(mymalloc_t)); 
+    temp = node + 1;  //take the next slot
+    //assert(temp); 
     memset(temp, '\0', sizeof(mymalloc_t)); 
-    temp->next = node->next; 
-    node->next->prev = temp;
-    temp->prev = node; 
-    node->next = temp; 
+    //case a
+    temp->addr = node->addr + size; 
     temp->size = size; 
     node->size = node->size - size; 
-    return;
+    node->available = false; 
+    temp->available = true; 
+    if (node->next){ 
+        temp->prev = node; 
+        temp->next = node->next; 
+        node->next->prev = temp;
+        node->next = temp; 
+    } else { 
+        temp->prev = node; 
+        temp->next = NULL;
+        node->next = temp; 
+    }
+    return temp->addr;
 }
 
-void *myMalloc(unsigned size){ 
+void printlist(){
+    while(node){ 
+        fprintf(stdout, "0x%p\n", (void *)node->addr);
+        node = node->next; 
+    }
+    return; 
+}
+
+void *mymalloc(unsigned size){ 
+    //return (void *) node->addr; 
     assert (size > 0); 
     while(node){ 
         if (hole(node) && node->size >= size){ 
-            split(node, size); 
-            return (void *) node->addr; 
+            return (void *) split(node, size); 
+            //return (void *) node->addr; 
         }
         node = node->next; 
     }
+    assert(0); 
     return NULL; 
 }
 
@@ -133,7 +169,7 @@ void myfree(void *ptr){
     assert((unsigned *) ptr > 0); 
     while(node){ 
         if (ptr == node->addr){ 
-            assert(!hole(node)); 
+            assert(!hole(node->addr)); 
             assert(getcurrentprocessid() == node->pid); 
             merge(node); 
         }
@@ -141,8 +177,7 @@ void myfree(void *ptr){
     }
 }
 
-int main(int argc, char *argv[])
-{
-    initmemory(); 
-    return 0;
+void mygraphnode(){ 
+    graphnode(node); 
 }
+

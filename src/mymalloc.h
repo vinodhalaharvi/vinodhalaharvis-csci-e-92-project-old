@@ -11,7 +11,6 @@ typedef struct _mymalloc_t {
     struct _mymalloc_t * prev; 
 } mymalloc_t;
 
-mymalloc_t * node; 
 
 
 void *mymalloc(unsigned int size);
@@ -23,8 +22,11 @@ char * booltostring(boolean bool);
 void printnode(mymalloc_t * node) ; 
 void printmemory(mymalloc_t * node); 
 void merge(mymalloc_t *node); 
-void split(mymalloc_t * node, unsigned size);
+mymalloc_t * split(mymalloc_t * node, unsigned size);
 void printboolean(boolean bool); 
 void printnode(mymalloc_t * node);
 void nodefree(mymalloc_t *node); 
+void * align(void * addr); 
+void mygraphnode(); 
+void printlist(); 
 #endif

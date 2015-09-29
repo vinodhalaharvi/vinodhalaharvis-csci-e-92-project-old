@@ -26,7 +26,6 @@
 
 //helper function to print the list
 void print(node_type * environ){
-    int i = 0;  
     while(environ){
         fprintf(stdout, "%s = %s\n", environ->key, environ->value);
         environ = environ->next;
@@ -35,7 +34,6 @@ void print(node_type * environ){
 
 //get the value for a given key
 value_type get(node_type * node, key_type key){
-    int i = 0;  
     while(node){
         if (match(node->key, key)){ 
             return node->value; 
@@ -59,9 +57,7 @@ void freenode(node_type * node){
 //delete from the list
 //many edge cases to consider
 void delete(node_type **head, key_type key){
-    int i = 0;  
     node_type * node = *head; 
-    node_type * temp; 
     while(node){
         if (match(node->key, key)){ 
             //delete the entire list if there is only one node
@@ -123,7 +119,6 @@ boolean match(key_type key, key_type otherkey) {
  
 //check if list contains the key
 boolean contains(node_type * node, key_type key){
-    int i = 0;  
     while(node){
         if (match(node->key, key)){ 
             return true; 
