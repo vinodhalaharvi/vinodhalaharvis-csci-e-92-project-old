@@ -26,29 +26,41 @@
 static unsigned long totalmemorysize = 1024 * 8; 
 static unsigned long totalheadersize = 512 * 1; 
 static unsigned long totaldatasize = 1024 * 8  - 512; 
-static mymalloc_t * node; 
+static mymalloc_t * start; 
 
 void * align(void * addr){ 
     return (void *)(((unsigned)addr + 7) & (~7)); 
 }
 
 void initmemory(){ 
-    node = (mymalloc_t *) malloc(totalmemorysize);
-    assert(node); 
-    memset(node, '\0', totalmemorysize); 
-    node->addr = align((void *)node + totalheadersize); 
-    /*fprintf(stdout, "node, align(node), node->addr: %p, %p, %p\n", 
-            node, align((void*)node), node->addr);*/
-    node->available = true; 
-    node->pid = 0;
-    node->next = NULL; 
-    node->prev = NULL; 
-    node->size = totaldatasize; 
+    mymalloc_t * trav; 
+    start = (mymalloc_t *) malloc(totalmemorysize);
+    assert(start); 
+    memset(start, '\0', totalmemorysize); 
+    start->addr = align((void *)start + totalheadersize); 
+    start->available = true; 
+    start->availableasheader = false; 
+
+    trav = start + 1; 
+    while(trav <= start + totalheadersize){ 
+        trav->available = true; 
+        trav->availableasheader = true; 
+        trav++; 
+    }
+    start->pid = 0;
+    start->next = NULL; 
+    start->prev = NULL; 
+    start->size = totaldatasize; 
     return;
 }
 
 boolean hole(mymalloc_t * node){ 
     return node->available == true; 
+}
+
+
+boolean headerhole(mymalloc_t * node){ 
+    return node->availableasheader == true; 
 }
 
 unsigned getcurrentprocessid(){ 
@@ -68,8 +80,10 @@ char * booltostring(boolean bool){
 }
 
 void printnode(mymalloc_t * node) { 
-    fprintf(stdout, "address=%p pid=%d size=%d available=%s\n",  node->addr, 
-            node->pid, node->size, booltostring(node->available)); 
+    fprintf(stdout, "address=%p pid=%d size=%d available=%s availableasheader=%s\n",  node->addr, 
+            node->pid, node->size, 
+            booltostring(node->available), 
+            booltostring(node->availableasheader)); 
 }
 
 void printmemory(mymalloc_t * node){ 
@@ -120,16 +134,19 @@ mymalloc_t *  split(mymalloc_t * node, unsigned size){
     mymalloc_t * temp; 
     assert(node); 
     assert(node->size >= size); 
-    //temp = (mymalloc_t *) malloc(sizeof(mymalloc_t)); 
-    temp = node + 1;  //take the next slot
-    //assert(temp); 
+    temp = allocheadernode(); 
+    assert(temp); 
     memset(temp, '\0', sizeof(mymalloc_t)); 
     //case a
-    temp->addr = node->addr + size; 
-    temp->size = size; 
     node->size = node->size - size; 
-    node->available = false; 
-    temp->available = true; 
+    temp->addr = node->addr + node->size; 
+    temp->size = size; 
+    /*node->available = false; 
+    temp->available = true; */
+    if (node->size > 0) { 
+        node->available = true; 
+    }
+    temp->available = false;
     if (node->next){ 
         temp->prev = node; 
         temp->next = node->next; 
@@ -144,20 +161,41 @@ mymalloc_t *  split(mymalloc_t * node, unsigned size){
 }
 
 void printlist(){
+    mymalloc_t * node; 
+    node = start; 
     while(node){ 
-        fprintf(stdout, "0x%p\n", (void *)node->addr);
+        //fprintf(stdout, "0x%p\n", (void *)node->addr);
+        printnode(node); 
         node = node->next; 
     }
     return; 
 }
 
+
+mymalloc_t * allocheadernode(){ 
+    mymalloc_t * trav = start;
+    while(trav){ 
+        if (headerhole(trav)){ 
+            trav->availableasheader = false; 
+            return (void * ) trav; 
+        }
+        trav++;
+    }
+    assert(0); 
+    return NULL; 
+}
+
+
 void *mymalloc(unsigned size){ 
-    //return (void *) node->addr; 
+    mymalloc_t * node; 
+    node = start; 
     assert (size > 0); 
+    assert (size <= totalmemorysize); 
     while(node){ 
+        assert(node <= start + totalheadersize); 
         if (hole(node) && node->size >= size){ 
+            //fprintf(stdout, "%p\n", node);
             return (void *) split(node, size); 
-            //return (void *) node->addr; 
         }
         node = node->next; 
     }
@@ -166,6 +204,8 @@ void *mymalloc(unsigned size){
 }
 
 void myfree(void *ptr){ 
+    mymalloc_t * node ; 
+    node = start; 
     assert((unsigned *) ptr > 0); 
     while(node){ 
         if (ptr == node->addr){ 
@@ -178,6 +218,7 @@ void myfree(void *ptr){
 }
 
 void mygraphnode(){ 
+    mymalloc_t * node = start; 
     graphnode(node); 
 }
 

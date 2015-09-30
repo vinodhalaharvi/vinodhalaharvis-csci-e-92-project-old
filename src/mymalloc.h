@@ -7,6 +7,7 @@ typedef struct _mymalloc_t {
     void * addr; 
     unsigned size; 
     boolean available; 
+    boolean availableasheader; 
     struct _mymalloc_t * next; 
     struct _mymalloc_t * prev; 
 } mymalloc_t;
@@ -29,4 +30,5 @@ void nodefree(mymalloc_t *node);
 void * align(void * addr); 
 void mygraphnode(); 
 void printlist(); 
+mymalloc_t * allocheadernode(); 
 #endif

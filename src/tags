@@ -35,9 +35,11 @@ _pushbutton	io.c	/^        struct _pushbutton {$/;"	s	union:_device_t::__anon2	f
 _stream_t	io.c	/^typedef struct _stream_t {$/;"	s	file:
 addr	mymalloc.h	/^    void * addr; $/;"	m	struct:_mymalloc_t
 align	mymalloc.c	/^void * align(void * addr){ $/;"	f
+allocheadernode	mymalloc.c	/^mymalloc_t * allocheadernode(){ $/;"	f
 allocnode	listgraph.c	/^mymalloc_t *  allocnode(unsigned pid, void * addr, $/;"	f
 allocstring	listgraph.c	/^char * allocstring(unsigned size){ $/;"	f
 available	mymalloc.h	/^    boolean available; $/;"	m	struct:_mymalloc_t
+availableasheader	mymalloc.h	/^    boolean availableasheader; $/;"	m	struct:_mymalloc_t
 boolean	map.h	/^typedef enum { false, true } boolean; $/;"	t	typeref:enum:__anon4
 boolean	mymalloc.h	/^typedef enum { false, true } boolean; $/;"	t	typeref:enum:__anon5
 booltostring	mymalloc.c	/^char * booltostring(boolean bool){ $/;"	f
@@ -89,6 +91,7 @@ get_command_function	shell.c	/^command_func_type get_command_function(char line[
 getcurrentprocessid	mymalloc.c	/^unsigned getcurrentprocessid(){ $/;"	f
 graph	listgraph.c	/^char *  graph(mymalloc_t * node){ $/;"	f
 graphnode	listgraph.c	/^void graphnode(mymalloc_t * node){ $/;"	f
+headerhole	mymalloc.c	/^boolean headerhole(mymalloc_t * node){ $/;"	f
 hole	mymalloc.c	/^boolean hole(mymalloc_t * node){ $/;"	f
 hour	shell.h	/^        unsigned hour; $/;"	m	struct:_clock::__anon7
 init	shell.c	/^void init(clock *clock){ $/;"	f
@@ -118,7 +121,6 @@ name	io.c	/^            char * name;$/;"	m	struct:_device_t::__anon2::_file	file
 name	shell.c	/^    char *name;$/;"	m	struct:commandEntry	file:
 next	map.h	/^    struct node_type * next; $/;"	m	struct:node_type	typeref:struct:node_type::node_type
 next	mymalloc.h	/^    struct _mymalloc_t * next; $/;"	m	struct:_mymalloc_t	typeref:struct:_mymalloc_t::_mymalloc_t
-node	mymalloc.c	/^static mymalloc_t * node; $/;"	v	file:
 node_type	map.h	/^typedef struct node_type {$/;"	s
 node_type	map.h	/^} node_type;$/;"	t	typeref:struct:node_type
 nodefree	mymalloc.c	/^void nodefree(mymalloc_t *node){ $/;"	f
@@ -140,6 +142,7 @@ size	mymalloc.h	/^    unsigned size; $/;"	m	struct:_mymalloc_t
 split	mymalloc.c	/^mymalloc_t *  split(mymalloc_t * node, unsigned size){ $/;"	f
 split	shell.c	/^void split(char line[LINE_MAX +1], char * delimiter, int *argc, char *argv[]){$/;"	f
 splitString	shell.c	/^void splitString(char * string, char delimiter, $/;"	f
+start	mymalloc.c	/^static mymalloc_t * start; $/;"	v	file:
 stream_t	io.c	/^} stream_t;$/;"	t	typeref:struct:_stream_t	file:
 subescapse_char	shell.c	/^char subescapse_char(char ch){ $/;"	f
 timeofday	shell.c	/^void timeofday(clock * clock, unsigned long seconds){ $/;"	f
